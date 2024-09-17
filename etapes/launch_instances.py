@@ -63,7 +63,6 @@ uvicorn main:app --host 0.0.0.0 --port 8000 &
 
 # Initialize boto3 clients
 ec2 = boto3.client('ec2', region_name=REGION)
-elb = boto3.client('elb', region_name=REGION)
 
 def create_key_pair():
     try:
