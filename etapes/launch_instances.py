@@ -128,7 +128,9 @@ def launch_instances(instance_type, count, security_group_id):
 def main():
     create_key_pair()
     security_group_id = create_security_group()
-    micro_instances = launch_instances(INSTANCE_TYPE_T2_MICRO, 1, security_group_id) #remplacer le 4 par 1 pour 4 instances 
-    
+
+    # Lance kles instnaces
+    micro_instances = launch_instances(INSTANCE_TYPE_T2_MICRO, 1, security_group_id) # Remplacer 1 par 4 pour avoir le bon nombre
+    large_instances = launch_instances(INSTANCE_TYPE_T2_LARGE, 1, security_group_id) # Remplacer 1 par 4 pour avoir le bon nombre
     
 main()
