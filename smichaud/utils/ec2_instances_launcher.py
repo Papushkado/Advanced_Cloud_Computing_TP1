@@ -1,6 +1,7 @@
 """Script to launch EC2 instances."""
 def launch_ec2_instance(ec2, 
-                key_pair_name, 
+                    key_pair_name, 
+                    security_group_id,
                     instance_type:str = "t2.micro", 
                     num_instances:int = 1, 
                     image_id:str =  "ami-0e86e20dae9224db8",
@@ -14,6 +15,7 @@ def launch_ec2_instance(ec2,
         'InstanceType': instance_type,
         'MinCount': num_instances,
         'MaxCount': num_instances,
+        "SecurityGroupIds": [security_group_id],
         'KeyName': key_pair_name,  # Replace with your key pair name
         'NetworkInterfaces': [{
             'AssociatePublicIpAddress': public_ip,

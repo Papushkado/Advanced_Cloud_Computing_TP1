@@ -2,6 +2,8 @@ import boto3
 import os
 from utils.ec2_instances_launcher import launch_ec2_instance
 from utils.create_key_pair import generate_key_pair
+from utils.create_security_group import create_security_group
+from utils.upload_content_to_instances import upload_files_to_instances
 
 # Retrieve AWS credentials from environment variables
 # TODO LOAD FROM FILE
@@ -18,6 +20,9 @@ ec2 = boto3.client('ec2',
     region_name = "us-east-1"
 )
 
-generate_key_pair(ec2, key_pair_name)
-instances_id = launch_ec2_instance(ec2, key_pair_name)
+key_pair_path = generate_key_pair(ec2, key_pair_name)
+group_id = create_security_group(ec2, "log8415E-tp1-security-group", "none")
+instances_id_ip = launch_ec2_instance(ec2, key_pair_name, group_id, "t2.micro", public_ip=True)
+
+upload_files_to_instances(ec2, instances_id_ip, key_pair_path, "instances_ressources", "log8415e")
 

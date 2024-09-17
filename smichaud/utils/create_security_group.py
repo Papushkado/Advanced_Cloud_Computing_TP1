@@ -5,9 +5,16 @@ import os
 
 def create_security_group(ec2_client, group_name, group_description):
     # Create a security group
+
+    
+    # Get default VPC ID
+    default_vpc = ec2_client.describe_vpcs()['Vpcs'][0]['VpcId']
+    
+
     response = ec2_client.create_security_group(
         GroupName=group_name,
-        Description=group_description
+        Description=group_description,
+        VpcId = default_vpc
     )
 
     group_id = response['GroupId']
