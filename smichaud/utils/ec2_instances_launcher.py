@@ -6,7 +6,8 @@ def launch_ec2_instance(ec2,
                     num_instances:int = 1, 
                     image_id:str =  "ami-0e86e20dae9224db8",
                     public_ip:bool = False,
-                    allow_ssh:bool = True
+                    user_data = "",
+                    tag:tuple[str,str] = None,
                     ):
     # Create EC2 client
     # Specify instance parameters
@@ -15,35 +16,43 @@ def launch_ec2_instance(ec2,
         'InstanceType': instance_type,
         'MinCount': num_instances,
         'MaxCount': num_instances,
-        "SecurityGroupIds": [security_group_id],
-        'KeyName': key_pair_name,  # Replace with your key pair name
+        'KeyName': key_pair_name,
         'NetworkInterfaces': [{
             'AssociatePublicIpAddress': public_ip,
             'DeviceIndex': 0,
-            'Groups': []
-        }]
+            'Groups': [security_group_id]
+        }],
     }
-
-    if allow_ssh:
-        instance_params['NetworkInterfaces'][0]['Groups'].append('sg-xxxxxxxx')  # Replace with your security group ID that allows SSH
+    if tag is not None:
+        instance_params["TagSpecifications"] = [
+            {"ResourceType": "instance", "Tags": [{"Key": tag[0], "Value": tag[1]}]}]
 
     # Launch the instance
     print("Launching instances...")
-    response = ec2.run_instances(**instance_params)
-
-
+    response = ec2.run_instances(UserData=user_data, **instance_params)
 
     # Get the instance ID
     instances_id_and_ip = []
     print("Waiting for instances to be running...")
     for instance in response['Instances']:
-        instance.wait_until_running()
         instance_id = instance['InstanceId']
         if not public_ip:
-            instances_id_and_ip.append((instance_id, instance.private_ip_address))
+            instances_id_and_ip.append((instance_id, instance["PrivateIpAddress"], None))
         else:
-            instances_id_and_ip.append((instance_id, instance.public_ip_address))
+            instances_id_and_ip.append((instance_id, instance["PrivateIpAddress"], instance["PublicDnsName"]))
 
     print(f"Launched {num_instances} EC2 instances of type {instance_type} with ID and ip: {instances_id_and_ip}")
 
     return instances_id_and_ip
+
+
+def shutdown_running_instances(ec2):
+    # Get all running instances
+    response = ec2.describe_instances(Filters=[{'Name': 'instance-state-name', 'Values': ['running']}])
+    instances = response['Reservations']
+    # Stop each instance
+    instance_ids = []
+    for instance in instances:
+        instance_ids.append(instance['Instances'][0]['InstanceId'])
+    print(f"Stopping instance {instance_ids}...")
+    ec2.stop_instances(InstanceIds=[instance_ids])
