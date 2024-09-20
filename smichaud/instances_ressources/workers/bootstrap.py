@@ -1,3 +1,5 @@
+# FastAPI app content
+MAIN_PY_CONTENT = """
 from fastapi import FastAPI
 import uvicorn
 import logging
@@ -34,3 +36,12 @@ async def cluster2():
 if __name__ == "__main__":
     # Run the FastAPI app
     uvicorn.run(app, host="0.0.0.0", port=8000)
+"""
+
+USER_DATA = f"""#!/bin/bash
+echo '{MAIN_PY_CONTENT}' > main.py
+sudo apt-get update && sudo apt-get upgrade -y
+sudo apt-get install python3 python3-pip -y
+sudo pip3 install fastapi uvicorn --break-system-packages
+uvicorn main:app --host 0.0.0.0 --port 8000
+"""
