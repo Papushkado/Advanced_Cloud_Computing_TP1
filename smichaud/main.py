@@ -1,13 +1,13 @@
 import boto3
 import os
 import time
-from utils.ec2_instances_launcher import launch_ec2_instance
+from utils.ec2_instances_launcher import launch_ec2_instance, shutdown_running_instances
 from utils.create_key_pair import generate_key_pair
 from utils.create_security_group import create_security_group
 from utils.run_command_on_instance import run_command_on_ec2
 
-from instances_ressources.workers.bootstrap import USER_DATA
-from instances_ressources.load_balancer.bootstrap import START_COMMAND, LOAD_BALANCER_USER_DATA
+from instances_ressources.workers.bootstrap import get_user_data
+from instances_ressources.load_balancer.bootstrap import get_lb_user_data
 
 # Retrieve AWS credentials from environment variables
 # TODO LOAD FROM FILE
@@ -27,13 +27,15 @@ ec2 = boto3.client('ec2',
 key_pair_path = generate_key_pair(ec2, key_pair_name)
 group_id = create_security_group(ec2, "log8415E-tp1-security-group", "none")
 
+
+worker_user_data = get_user_data()
 private_instance_cluster0 = launch_ec2_instance(
     ec2, 
     key_pair_name, 
     group_id, 
     "t2.micro", 
-    public_ip=False, 
-    user_data = USER_DATA, 
+    public_ip=True, # for now because when private lb cant communicate to it
+    user_data = worker_user_data, 
     tag=("CLUSTER", "0"), 
     num_instances=1)
 
@@ -42,25 +44,23 @@ private_instance_cluster1 = launch_ec2_instance(
     key_pair_name, 
     group_id, 
     "t2.micro", 
-    public_ip=False, 
-    user_data = USER_DATA, 
+    public_ip=True, # for now because when private lb cant communicate to it
+    user_data = worker_user_data, 
     tag=("CLUSTER", "1"),
     num_instances=1)
 
 
-#TODO ADD MAIN.PY TO FILES or Upload it using uplaod_content_to_instance
+lb_user_data = get_lb_user_data(aws_access_key_id, aws_secret_access_key, aws_session_token)
 lb_instance = launch_ec2_instance(
     ec2, 
     key_pair_name, 
     group_id, 
     "t2.micro", 
     public_ip=True, 
-    user_data = LOAD_BALANCER_USER_DATA.format(
-        aws_access_key_id, 
-        aws_secret_access_key, 
-        aws_session_token),
+    user_data = lb_user_data,
     num_instances=1)
-lb_instance = lb_instance[0]
+
+print(lb_instance)
 
 #todo:
 # check if tag is working.
@@ -79,6 +79,10 @@ lb_instance = lb_instance[0]
 #start benchmarking
 
 #
+
+
+
+#shutdown_running_instances(ec2)
 
 
 

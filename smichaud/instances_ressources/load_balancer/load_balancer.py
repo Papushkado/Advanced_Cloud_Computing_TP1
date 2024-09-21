@@ -5,13 +5,10 @@ import requests
 import random
 import boto3
 import os
+import uvicorn
 
 app = FastAPI()
 #credentials
-aws_access_key_id = os.environ.get('AWS_ACCESS_KEY_ID')
-aws_secret_access_key = os.environ.get('AWS_SECRET_ACCESS_KEY')
-aws_session_token = os.environ.get('AWS_SESSION_TOKEN')
-
 # Instances in Cluster 1 (t2.micro) and Cluster 2 (t2.large)
 GROUP_KEY = "CLUSTER"
 GROUP_0_TAG = "0"
@@ -25,7 +22,7 @@ cluster_2_ip_mapping = {}
 
 
 def get_instances_by_tag(tag_key, tag_value):
-    ec2 = boto3.client('ec2',
+    ec2 = boto3.client("ec2",
         aws_access_key_id=aws_access_key_id,
         aws_secret_access_key=aws_secret_access_key,
         aws_session_token = aws_session_token,
@@ -34,12 +31,12 @@ def get_instances_by_tag(tag_key, tag_value):
     response = ec2.describe_instances(
         Filters=[
             {
-                'Name': f'tag:{tag_key}',
-                'Values': [tag_value]
+                "Name": f"tag:{tag_key}",
+                "Values": [tag_value]
             },
             {
-                'Name': 'instance-state-name',
-                'Values': ['running']
+                "Name": "instance-state-name",
+                "Values": ["running"]
             }
         ]
     )
@@ -54,25 +51,23 @@ def get_instances_by_tag(tag_key, tag_value):
 @app.get("/cluster1")
 def loadbalance_cluster1():
     selected_instance = random.choice(cluster1_instances)
-    response = requests.get(f"http://{cluster_1_ip_mapping[selected_instance]}:8000/cluster1")
+    response = requests.get(f"http://{cluster_1_ip_mapping[selected_instance[0]]}/cluster1")
     return response.json()
 
 @app.get("/cluster2")
 def loadbalance_cluster2():
     selected_instance = random.choice(cluster2_instances)
-    response = requests.get(f"http://{cluster_2_ip_mapping[selected_instance]}:8000/cluster2")
+    response = requests.get(f"http://{cluster_2_ip_mapping[selected_instance[0]]}/cluster2")
     return response.json()
 
 if __name__ == "__main__":
-    #import uvicorn
-
     cluster1_instances = get_instances_by_tag(GROUP_KEY, GROUP_0_TAG)
     for instance in cluster1_instances:
         cluster_1_ip_mapping[instance[0]] = instance[1]
 
     cluster2_instances = get_instances_by_tag(GROUP_KEY, GROUP_1_TAG)
     for instance in cluster2_instances:
-        cluster2_instances[instance[0]] = instance[1]
+        cluster_2_ip_mapping[instance[0]] = instance[1]
 
     #load credentials from file that should have been uploaded alonside the code
     # may need to check if key pair is necessary for sending http requests
@@ -87,4 +82,4 @@ if __name__ == "__main__":
     #for each cluster request, send the request to the instance with the lowest cpu usage
 
 
-    #uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run(app, host="0.0.0.0", port=80)

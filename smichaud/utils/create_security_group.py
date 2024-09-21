@@ -40,8 +40,8 @@ def create_security_group(ec2_client, group_name, group_description):
             },
             {
                 'IpProtocol': 'tcp',
-                'FromPort': 8000,
-                'ToPort': 8000,
+                'FromPort': 80,
+                'ToPort': 80,
                 'IpRanges': [{'CidrIp': '0.0.0.0/0'}]  # Allow FastAPI
             }
         ]
