@@ -1,8 +1,9 @@
 import boto3
 import os
 from pathlib import Path
+
+# Generate a key pair
 def generate_key_pair(ec2_client, key_pair_name, out_path = "temp"):
-    # Generate a key pair
     key_pair_path = Path(os.path.join(out_path, f'{key_pair_name}.pem'))
     if key_pair_path.exists():
         print(f"Key pair '{key_pair_name}' already exists.")
