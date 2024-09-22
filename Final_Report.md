@@ -24,3 +24,17 @@ The load balancer was set up using `get_lb_user_data`. This script installs depe
 - Uses CloudWatch metrics to monitor CPU utilization of each worker.
 
 - Distributes incoming requests to the worker with the lowest CPU usage.
+
+## Cluster Setup Using Application Load Balancer
+
+We deployed two clusters:
+
+- **Cluster 0:** Instances of type t2.micro.
+- **Cluster 1:** Instances of type t2.large.
+
+Each cluster was tagged accordingly, allowing the load balancer to differentiate between them. The load balancer was configured to route traffic between these clusters based on CPU utilization metrics.
+
+### Tagging and Instance Management
+
+Each instance was tagged as part of either Cluster 0 or Cluster 1. The load balancer uses these tags to direct traffic, ensuring that requests are handled efficiently. The custom logic for this was written in Python and deployed on an EC2 instance running the load balancer.
+
