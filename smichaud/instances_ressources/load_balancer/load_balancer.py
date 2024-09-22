@@ -96,15 +96,17 @@ if __name__ == "__main__":
 
     cluster2_instances = get_instances_by_tag(GROUP_KEY, GROUP_1_TAG)
 
-    #load credentials from file that should have been uploaded alonside the code
+    # load credentials from file that should have been uploaded alongside the code
     # may need to check if key pair is necessary for sending http requests
 
-    #todo establish map of instancei/id + private ip for both groups
-    #   map should contain cpu usage
-    #  2 maps like this: instance_id -> {private_ip} and instance_id -> {cpu_usage}
+    # Description :
+    # establish map of instancei/id + private ip for both groups
+    # map should contain cpu usage
+    # 2 maps like this: instance_id -> {private_ip} and instance_id -> {cpu_usage}
 
-    #either start a thread to update the cpu usage
-    #or just update the cpu usage every requests
+    # either start a thread to update the cpu usage
+    # or just update the cpu usage every requests
 
-    #for each cluster request, send the request to the instance with the lowest cpu usage
+    # for each cluster request, send the request to the instance with the lowest cpu usage
+    
     uvicorn.run(app, host="0.0.0.0", port=80)
