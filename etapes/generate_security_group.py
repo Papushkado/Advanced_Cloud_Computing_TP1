@@ -15,7 +15,6 @@ VPC_ID = "vpc-0085fffff3cf0af11"
 
 # Initialize boto3 clients
 ec2 = boto3.client('ec2', region_name=REGION)
-elb = boto3.client('elb', region_name=REGION)
 
 def create_security_group():
     try:
