@@ -43,6 +43,18 @@ def create_security_group(ec2_client, group_name, group_description):
                 'FromPort': 80,
                 'ToPort': 80,
                 'IpRanges': [{'CidrIp': '0.0.0.0/0'}]  # Allow FastAPI
+            },
+            {
+                'IpProtocol': 'tcp',
+                'FromPort': 443,
+                'ToPort': 443,
+                'IpRanges': [{'CidrIp': '0.0.0.0/0'}]  # Allow HTTPS
+            },
+            {
+                'IpProtocol': 'icmp',
+                'FromPort': -1,
+                'ToPort': -1,
+                'IpRanges': [{'CidrIp': '0.0.0.0/0'}]  # Allow ICMP
             }
         ]
     )

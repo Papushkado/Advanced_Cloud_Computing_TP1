@@ -6,20 +6,43 @@ import random
 import boto3
 import os
 import uvicorn
+import datetime
 
 app = FastAPI()
 #credentials
 # Instances in Cluster 1 (t2.micro) and Cluster 2 (t2.large)
+SWITCH_THRESHOLD = 0.50
 GROUP_KEY = "CLUSTER"
 GROUP_0_TAG = "0"
 GROUP_1_TAG = "1"
 cluster1_instances = []
+current_id_cluster1 = 0
 cluster2_instances = []
+current_id_cluster2 = 0
+cpu_loads = {}
 
-cluster_1_ip_mapping = {}
-cluster_2_ip_mapping = {}
 
+cloudwatch = boto3.client("cloudwatch",
+    aws_access_key_id=aws_access_key_id,
+    aws_secret_access_key=aws_secret_access_key,
+    aws_session_token=aws_session_token,
+    region_name="us-east-1"
+)
 
+def get_cpu_load(instance_id):
+    response = cloudwatch.get_metric_statistics(
+        Namespace="AWS/EC2",
+        MetricName="CPUUtilization",
+        Dimensions=[{"Name": "InstanceId", "Value": instance_id}],
+        StartTime=datetime.datetime.now(datetime.timezone.utc) - datetime.timedelta(seconds=3600),
+        EndTime=datetime.datetime.now(datetime.timezone.utc),
+        Period=10,
+        Statistics=["Average"],
+    )
+    if len(response["Datapoints"]) > 0:
+        return response["Datapoints"][-1]["Average"]
+    else:
+        return 0.0
 
 def get_instances_by_tag(tag_key, tag_value):
     ec2 = boto3.client("ec2",
@@ -49,25 +72,29 @@ def get_instances_by_tag(tag_key, tag_value):
     return instances
 
 @app.get("/cluster1")
-def loadbalance_cluster1():
-    selected_instance = random.choice(cluster1_instances)
-    response = requests.get(f"http://{cluster_1_ip_mapping[selected_instance[0]]}/cluster1")
+def loadbalance_cluster2():
+    global current_id_cluster1
+    cpu_load = get_cpu_load(cluster1_instances[current_id_cluster1][0])
+    if cpu_load > SWITCH_THRESHOLD:
+        current_id_cluster1 = (current_id_cluster1 + 1) % len(cluster1_instances)
+    selected_instance = cluster1_instances[current_id_cluster1]
+    response = requests.get(f"http://{selected_instance[1]}/cluster1")
     return response.json()
 
 @app.get("/cluster2")
 def loadbalance_cluster2():
-    selected_instance = random.choice(cluster2_instances)
-    response = requests.get(f"http://{cluster_2_ip_mapping[selected_instance[0]]}/cluster2")
+    global current_id_cluster2
+    cpu_load = get_cpu_load(cluster2_instances[current_id_cluster2][0])
+    if cpu_load > SWITCH_THRESHOLD:
+        current_id_cluster2 = (current_id_cluster2 + 1) % len(cluster2_instances)
+    selected_instance = cluster2_instances[current_id_cluster2]
+    response = requests.get(f"http://{selected_instance[1]}/cluster2")
     return response.json()
 
 if __name__ == "__main__":
     cluster1_instances = get_instances_by_tag(GROUP_KEY, GROUP_0_TAG)
-    for instance in cluster1_instances:
-        cluster_1_ip_mapping[instance[0]] = instance[1]
 
     cluster2_instances = get_instances_by_tag(GROUP_KEY, GROUP_1_TAG)
-    for instance in cluster2_instances:
-        cluster_2_ip_mapping[instance[0]] = instance[1]
 
     #load credentials from file that should have been uploaded alonside the code
     # may need to check if key pair is necessary for sending http requests
@@ -80,6 +107,4 @@ if __name__ == "__main__":
     #or just update the cpu usage every requests
 
     #for each cluster request, send the request to the instance with the lowest cpu usage
-
-
     uvicorn.run(app, host="0.0.0.0", port=80)
