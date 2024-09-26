@@ -75,5 +75,25 @@ time.sleep(300)
 # cleanup instances, security group, keypair 
 
 
+##### In this part, we are going to clean_up, all the set up environnement
 
+def terminate_instances(ec2, instance_ids):
+    response = ec2.terminate_instances(instance_ids=instance_ids)
+    return response
 
+def delete_key_pair(ec2, key_name):
+    response = ec2.delete_key_pair(KeyName=key_name)
+    return response
+
+def delete_security_group(ec2, group_ids):
+    response = ec2.delete_security_group(group_id=group_id)
+    return response
+
+def clean_up(ec2, instance_ids, key_name, group_id):
+    
+    terminate_instances(ec2,instance_ids)
+    delete_key_pair(ec2,key_name)
+    delete_security_group(ec2, group_id)
+    
+instance_ids = [private_instance_cluster0[0][0], private_instance_cluster1[0][0], lb_instance_id]
+clean_up(ec2, instance_ids, key_pair_name, group_id)
