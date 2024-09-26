@@ -12,7 +12,7 @@ def launch_ec2_instance(ec2,
     # Create EC2 client
     # Specify instance parameters
     instance_params = {
-        'ImageId': image_id,  # Amazon Linux 2 AMI ID (us-east-1)
+        'ImageId': image_id, 
         'InstanceType': instance_type,
         'MinCount': num_instances,
         'MaxCount': num_instances,
