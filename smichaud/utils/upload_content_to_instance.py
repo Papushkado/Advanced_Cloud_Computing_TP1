@@ -1,7 +1,7 @@
 import os
 import paramiko
 
-def upload_files_to_instances(ec2, instance_id, key_pair_path, source_folder):
+def upload_files_to_instances(ec2, instance_id, key_pair_path, source_folder, out_folder = "temp"):
 
     ssh = paramiko.SSHClient()
     privkey = paramiko.RSAKey.from_private_key_file(key_pair_path)
@@ -26,7 +26,7 @@ def upload_files_to_instances(ec2, instance_id, key_pair_path, source_folder):
         for root, _, files in os.walk(source_folder):
             for file in files:
                 local_path =  os.path.join(root, file)
-                remote_path = os.path.join(f'{file}')
+                remote_path = os.path.join(out_folder,f'{file}')
                 
                 # Upload the file
                 sftp.put(local_path, remote_path)
