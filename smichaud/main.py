@@ -85,7 +85,7 @@ def delete_key_pair(ec2, key_name):
     response = ec2.delete_key_pair(KeyName=key_name)
     return response
 
-def delete_security_group(ec2, group_ids):
+def delete_security_group(ec2, group_id):
     response = ec2.delete_security_group(group_id=group_id)
     return response
 
