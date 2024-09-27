@@ -11,9 +11,7 @@ from dotenv import load_dotenv
 from instances_ressources.workers.bootstrap import get_user_data
 from instances_ressources.load_balancer.bootstrap import get_lb_user_data
 
-# Retrieve AWS credentials from environment variables
-# TODO LOAD FROM FILE instead of env variables. The file should be first added to the repo (EMPTY) but then put in a git ignore
-#so that when we add our credentials, it cannot but pushed to the remote
+# Retrieve AWS credentials from .env file
 
 load_dotenv()
 
