@@ -6,6 +6,7 @@ from utils.create_key_pair import generate_key_pair
 from utils.create_security_group import create_security_group
 from utils.run_command_on_instance import run_command_on_ec2
 from utils.upload_content_to_instance import upload_files_to_instances
+from dotenv import load_dotenv
 
 from instances_ressources.workers.bootstrap import get_user_data
 from instances_ressources.load_balancer.bootstrap import get_lb_user_data
@@ -14,9 +15,11 @@ from instances_ressources.load_balancer.bootstrap import get_lb_user_data
 # TODO LOAD FROM FILE instead of env variables. The file should be first added to the repo (EMPTY) but then put in a git ignore
 #so that when we add our credentials, it cannot but pushed to the remote
 
-aws_access_key_id = os.environ.get('AWS_ACCESS_KEY_ID')
-aws_secret_access_key = os.environ.get('AWS_SECRET_ACCESS_KEY')
-aws_session_token = os.environ.get('AWS_SESSION_TOKEN')
+load_dotenv()
+
+aws_access_key_id = os.getenv('AWS_ACCESS_KEY_ID')
+aws_secret_access_key = os.getenv('AWS_SECRET_ACCESS_KEY')
+aws_session_token = os.getenv('AWS_SESSION_TOKEN')
 
 key_pair_name = 'log8415E-tp1-key-pair'
 # Create EC2 client
