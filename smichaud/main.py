@@ -12,8 +12,11 @@ from instances_ressources.workers.bootstrap import get_user_data
 from instances_ressources.load_balancer.bootstrap import get_lb_user_data
 
 # Retrieve AWS credentials from .env file
-
-load_dotenv()
+os.environ.pop('AWS_ACCESS_KEY_ID', None)
+os.environ.pop('AWS_SECRET_ACCESS_KEY', None)
+os.environ.pop('AWS_SESSION_TOKEN', None)
+# Load .env file
+load_dotenv(dotenv_path='./.env')
 
 aws_access_key_id = os.getenv('AWS_ACCESS_KEY_ID')
 aws_secret_access_key = os.getenv('AWS_SECRET_ACCESS_KEY')
