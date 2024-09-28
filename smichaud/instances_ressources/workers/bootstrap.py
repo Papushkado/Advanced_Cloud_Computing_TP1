@@ -4,7 +4,7 @@ USER_DATA = """#!/bin/bash
 echo '{script}' > main.py
 sudo apt-get update && sudo apt-get upgrade -y
 sudo apt-get install python3 python3-pip -y
-sudo pip3 install fastapi uvicorn --break-system-packages
+sudo pip3 install fastapi uvicorn ec2-metadata --break-system-packages
 uvicorn main:app --host 0.0.0.0 --port 80
 """
 
