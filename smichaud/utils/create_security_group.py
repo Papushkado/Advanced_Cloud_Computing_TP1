@@ -58,5 +58,34 @@ def create_security_group(ec2_client, group_name, group_description):
             }
         ]
     )
+    ec2_client.authorize_security_group_egress(
+        GroupId=group_id,
+        IpPermissions=[
+            {
+                'IpProtocol': 'tcp',
+                'FromPort': 22,
+                'ToPort': 22,
+                'IpRanges': [{'CidrIp': '0.0.0.0/0'}]  # Allow SSH
+            },
+            {
+                'IpProtocol': 'tcp',
+                'FromPort': 80,
+                'ToPort': 80,
+                'IpRanges': [{'CidrIp': '0.0.0.0/0'}]  # Allow FastAPI
+            },
+            {
+                'IpProtocol': 'tcp',
+                'FromPort': 443,
+                'ToPort': 443,
+                'IpRanges': [{'CidrIp': '0.0.0.0/0'}]  # Allow HTTPS
+            },
+            {
+                'IpProtocol': 'icmp',
+                'FromPort': -1,
+                'ToPort': -1,
+                'IpRanges': [{'CidrIp': '0.0.0.0/0'}]  # Allow ICMP
+            }
+        ]
+    )
     print("Security group created successfully.")
     return group_id
