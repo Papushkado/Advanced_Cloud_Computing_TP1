@@ -96,9 +96,9 @@ def delete_security_group(ec2, group_id):
 def clean_up(ec2, instance_ids, key_name, group_id):
     
     terminate_instances(ec2,instance_ids)
-    time.sleep(90) # We wait 1mn30 to be sure that the instances are deleted
+    time.sleep(400) # We wait 1mn30 to be sure that the instances are deleted
     delete_key_pair(ec2,key_name)
-    time.sleep(30) # We wait 30s to be sure that the key_pairs are deleted
+    time.sleep(60) # We wait 30s to be sure that the key_pairs are deleted
     delete_security_group(ec2, group_id) # We need all the instances to be deleted before deleting the security group
     
     
