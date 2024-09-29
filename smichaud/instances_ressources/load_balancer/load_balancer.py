@@ -55,8 +55,8 @@ def get_instances_by_tag(tag_key, tag_value):
 
 def get_response_times_instances(instances):
     response_times = []
-    for instance, _ in instances:
-        response_times.append(requests.get(f"http://{instance}").elapsed.total_seconds())
+    for instance in instances:
+        response_times.append(requests.get(f"http://{instance[1]}").elapsed.total_seconds())
     return response_times
 
 @app.get("/cluster1")
