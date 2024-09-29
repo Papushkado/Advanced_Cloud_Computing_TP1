@@ -11,38 +11,20 @@ import datetime
 app = FastAPI()
 #credentials
 # Instances in Cluster 1 (t2.micro) and Cluster 2 (t2.large)
-SWITCH_THRESHOLD = 0.50
+SWITCH_THRESHOLD = 10
 GROUP_KEY = "CLUSTER"
 GROUP_0_TAG = "0"
 GROUP_1_TAG = "1"
 cluster1_instances = []
 current_id_cluster1 = 0
+nb_requests_since_last_compute_cluster1 = SWITCH_THRESHOLD
+
 cluster2_instances = []
 current_id_cluster2 = 0
-cpu_loads = {}
+nb_requests_since_last_compute_cluster2 = SWITCH_THRESHOLD
 
-
-cloudwatch = boto3.client("cloudwatch",
-    aws_access_key_id=aws_access_key_id,
-    aws_secret_access_key=aws_secret_access_key,
-    aws_session_token=aws_session_token,
-    region_name="us-east-1"
-)
-
-def get_cpu_load(instance_id):
-    response = cloudwatch.get_metric_statistics(
-        Namespace="AWS/EC2",
-        MetricName="CPUUtilization",
-        Dimensions=[{"Name": "InstanceId", "Value": instance_id}],
-        StartTime=datetime.datetime.now(datetime.timezone.utc) - datetime.timedelta(seconds=3600),
-        EndTime=datetime.datetime.now(datetime.timezone.utc),
-        Period=10,
-        Statistics=["Average"],
-    )
-    if len(response["Datapoints"]) > 0:
-        return response["Datapoints"][-1]["Average"]
-    else:
-        return 0.0
+response_times_cluster1 = []
+response_times_cluster2 = []
 
 def get_instances_by_tag(tag_key, tag_value):
     ec2 = boto3.client("ec2",
@@ -71,12 +53,22 @@ def get_instances_by_tag(tag_key, tag_value):
 
     return instances
 
+def get_response_times_instances(instances):
+    response_times = []
+    for instance, _ in instances:
+        response_times.append(requests.get(f"http://{instance}").elapsed.total_seconds())
+    return response_times
+
 @app.get("/cluster1")
 def loadbalance_cluster2():
     global current_id_cluster1
-    cpu_load = get_cpu_load(cluster1_instances[current_id_cluster1][0])
-    if cpu_load > SWITCH_THRESHOLD:
-        current_id_cluster1 = (current_id_cluster1 + 1) % len(cluster1_instances)
+    global nb_requests_since_last_compute_cluster1
+    nb_requests_since_last_compute_cluster1 +=1
+    if nb_requests_since_last_compute_cluster1 >= SWITCH_THRESHOLD:
+        response_times_cluster1 = get_response_times_instances(cluster1_instances)
+        nb_requests_since_last_compute_cluster1 = 0
+        current_id_cluster1 = response_times_cluster1.index(min(response_times_cluster1))
+
     selected_instance = cluster1_instances[current_id_cluster1]
     response = requests.get(f"http://{selected_instance[1]}/cluster1")
     return response.json()
@@ -84,16 +76,18 @@ def loadbalance_cluster2():
 @app.get("/cluster2")
 def loadbalance_cluster2():
     global current_id_cluster2
-    cpu_load = get_cpu_load(cluster2_instances[current_id_cluster2][0])
-    if cpu_load > SWITCH_THRESHOLD:
-        current_id_cluster2 = (current_id_cluster2 + 1) % len(cluster2_instances)
+    global nb_requests_since_last_compute_cluster2
+    nb_requests_since_last_compute_cluster2 +=1
+    if nb_requests_since_last_compute_cluster2 >= SWITCH_THRESHOLD:
+        response_times_cluster2 = get_response_times_instances(cluster2_instances)
+        nb_requests_since_last_compute_cluster2 = 0
+        current_id_cluster2 = response_times_cluster2.index(min(response_times_cluster2))
     selected_instance = cluster2_instances[current_id_cluster2]
     response = requests.get(f"http://{selected_instance[1]}/cluster2")
     return response.json()
 
 if __name__ == "__main__":
     cluster1_instances = get_instances_by_tag(GROUP_KEY, GROUP_0_TAG)
-
     cluster2_instances = get_instances_by_tag(GROUP_KEY, GROUP_1_TAG)
 
     # load credentials from file that should have been uploaded alongside the code

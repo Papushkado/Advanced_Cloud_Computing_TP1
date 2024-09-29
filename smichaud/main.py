@@ -72,6 +72,7 @@ lb_instance = launch_ec2_instance(
     "t2.micro",  #TODO PUT CORRECT TYPE OF INSTANCE
     public_ip=True, 
     user_data = lb_user_data,
+    tag=("Name", "load_balancer"),
     num_instances=1)
 
 lb_instance_id = "i-028eaef00ac705b21"
@@ -109,8 +110,11 @@ def delete_security_group(ec2, group_id):
 def clean_up(ec2, instance_ids, key_name, group_id):
     
     terminate_instances(ec2,instance_ids)
+    time.sleep(400) # We wait 1mn30 to be sure that the instances are deleted
     delete_key_pair(ec2,key_name)
-    delete_security_group(ec2, group_id)
+    time.sleep(60) # We wait 30s to be sure that the key_pairs are deleted
+    delete_security_group(ec2, group_id) # We need all the instances to be deleted before deleting the security group
+    
     
 instance_ids = [private_instance_cluster0[0][0], private_instance_cluster1[0][0], lb_instance_id]
 clean_up(ec2, instance_ids, key_pair_name, group_id)
