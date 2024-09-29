@@ -49,7 +49,7 @@ def get_instances_by_tag(tag_key, tag_value):
     if len(response["Reservations"]) == 0:
         return []
 
-    instances = [(res["Instances"][0]["InstanceId"], res["Instances"][0]["PrivateIpAddress"]) for res in response["Reservations"]]
+    instances = [(res["InstanceId"], res["PrivateIpAddress"]) for res in response["Reservations"][0]["Instances"]]
 
     return instances
 
