@@ -17,11 +17,11 @@ GROUP_0_TAG = "0"
 GROUP_1_TAG = "1"
 cluster1_instances = []
 current_id_cluster1 = 0
-nb_requests_since_last_compute_cluster1 = 10
+nb_requests_since_last_compute_cluster1 = SWITCH_THRESHOLD
 
 cluster2_instances = []
 current_id_cluster2 = 0
-nb_requests_since_last_compute_cluster2 = 10
+nb_requests_since_last_compute_cluster2 = SWITCH_THRESHOLD
 
 response_times_cluster1 = []
 response_times_cluster2 = []
