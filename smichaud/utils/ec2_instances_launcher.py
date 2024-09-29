@@ -44,15 +44,3 @@ def launch_ec2_instance(ec2,
     print(f"Launched {num_instances} EC2 instances of type {instance_type} with ID and ip: {instances_id_and_ip}")
 
     return instances_id_and_ip
-
-
-def shutdown_running_instances(ec2):
-    # Get all running instances
-    response = ec2.describe_instances(Filters=[{'Name': 'instance-state-name', 'Values': ['running']}])
-    instances = response['Reservations']
-    # Stop each instance
-    instance_ids = []
-    for instance in instances:
-        instance_ids.append(instance['Instances'][0]['InstanceId'])
-    print(f"Stopping instance {instance_ids}...")
-    ec2.stop_instances(InstanceIds=[instance_ids])
