@@ -66,6 +66,7 @@ lb_instance = launch_ec2_instance(
     "t2.micro",  #TODO PUT CORRECT TYPE OF INSTANCE
     public_ip=True, 
     user_data = lb_user_data,
+    tag=("Name", "load_balancer"),
     num_instances=1)
 
 lb_instance_id = lb_instance[0][0]
