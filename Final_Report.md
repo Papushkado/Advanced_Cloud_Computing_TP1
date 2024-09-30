@@ -43,9 +43,9 @@ Each worker runs the FastAPI application via Uvicorn. The load balancing and clu
 
 The load balancer was set up using `get_lb_user_data`. This script installs dependencies and runs a Python script (`load_balancer.py`) on a dedicated instance to handle traffic distribution between workers. The load balancer:
 
-- Uses CloudWatch metrics to monitor CPU utilization of each worker.
-
-- Distributes incoming requests to the worker with the lowest CPU usage.
+- Uses responsivness of http requests to determine the cluster with the least load.
+- Distributes requests between the clusters based on their responnsiveness.
+- This responsiveness is computed every 10 requests.
 
 ## Cluster Setup Using Application Load Balancer
 
@@ -64,7 +64,7 @@ Each instance was tagged as part of either Cluster 0 or Cluster 1. The load bala
 
 ### Expectations
 
-Before any experiment, we expect that the t2.micro cluster reaches its limits (CPU utilization, Latency and Response Time) before the t2.large cluster. 
+Before any experiment, we expect that the t2.micro cluster to have higher response time than the t2.large. It is to note however that the workload is not expensive, so the difference in response time might not be significant.
 Indeed, the capacity of the virtual machines entail different behaviors regarding the amount of requests. 
 
 ### CPU Utilization 
