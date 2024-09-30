@@ -48,11 +48,9 @@ Each worker runs the FastAPI application via Uvicorn. The load balancing and clu
 
 The load balancer was set up using `get_lb_user_data`. This script installs dependencies and runs a Python script (`load_balancer.py`) on a dedicated instance to handle traffic distribution between workers. The load balancer:
 
-- Uses responsivness of http requests to determine the cluster with the least load.
-- Distributes requests between the clusters based on their responnsiveness.
-- This responsiveness is computed every 10 requests.
-
-_Remark :_ The responnsiveness is calculated after a fix number of requests sent. (10 on each cluster in [Folder load\_balancer :](#folder-load_balancer-) in load_balancer.py)
+- Uses responsiveness of http requests to determine the cluster with the least load.
+- Distributes requests between the clusters based on their responsiveness.
+- This responsiveness is calculated after a fix number of requests sent. (10 on each cluster in [Folder load\_balancer :](#folder-load_balancer-) in load_balancer.py)
 
 ## Cluster Setup Using Application Load Balancer
 
