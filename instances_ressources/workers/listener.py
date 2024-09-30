@@ -2,6 +2,7 @@ from fastapi import FastAPI
 import uvicorn
 import logging
 import os
+from ec2_metadata import ec2_metadata
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -11,8 +12,7 @@ logger = logging.getLogger(__name__)
 app = FastAPI()
 
 # Get instance ID (you can pass this as an environment variable for each instance)
-instance_id = os.getenv("INSTANCE_ID", "Unknown Instance")
-
+instance_id = ec2_metadata.instance_id
 @app.get("/")
 async def root():
     message = f"Instance {instance_id} has received the request"
@@ -33,4 +33,4 @@ async def cluster2():
 
 if __name__ == "__main__":
     # Run the FastAPI app
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run(app, host="0.0.0.0", port=80)
