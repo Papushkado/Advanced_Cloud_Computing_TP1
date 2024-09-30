@@ -12,9 +12,8 @@ from dotenv import load_dotenv
 
 from instances_ressources.workers.bootstrap import get_user_data
 from instances_ressources.load_balancer.bootstrap import get_lb_user_data
-import logging
-import sys
-import os
+
+
 
 os.environ.pop('AWS_ACCESS_KEY_ID', None)
 os.environ.pop('AWS_SECRET_ACCESS_KEY', None)
@@ -75,8 +74,8 @@ lb_instance = launch_ec2_instance(
     tag=("Name", "load_balancer"),
     num_instances=1)
 
-lb_instance_id = "i-028eaef00ac705b21"
-time.sleep(500)
+lb_instance_id = lb_instance[0][0]
+time.sleep(300)
 
 #TODO:
 #get public ip adress from lb instance id
@@ -96,7 +95,7 @@ asyncio.run(run_benchmark(lb_public_ip))
 ##### In this part, we are going to clean_up, all the set up environnement
 
 def terminate_instances(ec2, instance_ids):
-    response = ec2.terminate_instances(instance_ids=instance_ids)
+    response = ec2.terminate_instances(InstanceIds=instance_ids)
     return response
 
 def delete_key_pair(ec2, key_name):
@@ -104,7 +103,7 @@ def delete_key_pair(ec2, key_name):
     return response
 
 def delete_security_group(ec2, group_id):
-    response = ec2.delete_security_group(group_id=group_id)
+    response = ec2.delete_security_group(GroupId=group_id)
     return response
 
 def clean_up(ec2, instance_ids, key_name, group_id):
