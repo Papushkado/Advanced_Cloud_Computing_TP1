@@ -52,6 +52,8 @@ The load balancer was set up using `get_lb_user_data`. This script installs depe
 - Distributes requests between the clusters based on their responnsiveness.
 - This responsiveness is computed every 10 requests.
 
+_Remark :_ The responnsiveness is calculated after a fix number of requests sent. (10 on each cluster in [Folder load\_balancer :](#folder-load_balancer-) in load_balancer.py)
+
 ## Cluster Setup Using Application Load Balancer
 
 We deployed two clusters:
@@ -59,7 +61,7 @@ We deployed two clusters:
 - **Cluster 1:** Instances of type t2.micro.
 - **Cluster 2:** Instances of type t2.large.
 
-Each cluster was tagged accordingly, allowing the load balancer to differentiate between them. The load balancer was configured to route traffic between these clusters based on CPU utilization metrics.
+Each cluster was tagged accordingly, allowing the load balancer to differentiate between them. The load balancer was configured to route traffic between these clusters based on the time response of instances. The fastest to answer will have the request.
 
 ### Tagging and Instance Management
 
