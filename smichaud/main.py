@@ -75,7 +75,7 @@ lb_instance = launch_ec2_instance(
     tag=("Name", "load_balancer"),
     num_instances=1)
 
-lb_instance_id = "i-028eaef00ac705b21"
+lb_instance_id = lb_instance[0][0]
 time.sleep(500)
 
 #TODO:
