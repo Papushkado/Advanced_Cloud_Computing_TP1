@@ -12,7 +12,7 @@ from instances_ressources.workers.bootstrap import get_user_data
 from instances_ressources.load_balancer.bootstrap import get_lb_user_data
 
 
-INSTANCES_INSTALL_DELAY = 500
+INSTANCES_INSTALL_DELAY = 800
 # Clear environment variables
 os.environ.pop('AWS_ACCESS_KEY_ID', None)
 os.environ.pop('AWS_SECRET_ACCESS_KEY', None)
