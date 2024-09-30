@@ -8,11 +8,8 @@
     - [Load Balancer Deployment](#load-balancer-deployment)
   - [Cluster Setup Using Application Load Balancer](#cluster-setup-using-application-load-balancer)
     - [Tagging and Instance Management](#tagging-and-instance-management)
-  - [Benchmark Results](#benchmark-results)
     - [Expectations](#expectations)
-    - [CPU Utilization](#cpu-utilization)
-    - [Latency and Response Times](#latency-and-response-times)
-    - [Throughput](#throughput)
+  - [Benchmark Results](#benchmark-results)
   - [Instructions to Run code](#instructions-to-run-code)
     - [Prerequisites](#prerequisites)
   - [EC2 Instance Creation](#ec2-instance-creation)
@@ -59,8 +56,8 @@ The load balancer was set up using `get_lb_user_data`. This script installs depe
 
 We deployed two clusters:
 
-- **Cluster 0:** Instances of type t2.micro.
-- **Cluster 1:** Instances of type t2.large.
+- **Cluster 1:** Instances of type t2.micro.
+- **Cluster 2:** Instances of type t2.large.
 
 Each cluster was tagged accordingly, allowing the load balancer to differentiate between them. The load balancer was configured to route traffic between these clusters based on CPU utilization metrics.
 
@@ -68,24 +65,27 @@ Each cluster was tagged accordingly, allowing the load balancer to differentiate
 
 Each instance was tagged as part of either Cluster 0 or Cluster 1. The load balancer uses these tags to direct traffic, ensuring that requests are handled efficiently. The custom logic for this was written in Python and deployed on an EC2 instance running the load balancer.
 
-## Benchmark Results 
-
 ### Expectations
 
 Before any experiment, we expect that the t2.micro cluster to have higher response time than the t2.large. It is to note however that the workload is not expensive, so the difference in response time might not be significant.
 Indeed, the capacity of the virtual machines entail different behaviors regarding the amount of requests. 
 
-### CPU Utilization 
+## Benchmark Results 
 
+The raw results of the benchmark are the following : 
+- Cluster 1 (t2.micro) : 
+```
+Total time taken: 6.75 seconds
+Average time per request: 0.0067 seconds
+```
+- Cluster 2 (t2.large) : 
+```
+Total time taken: 5.87 seconds
+Average time per request: 0.0059 seconds
+```
 
-### Latency and Response Times
-
-We tested the latency and response times for each cluster by sending 1000 requests to the load balancer and observing how long each cluster took to respond.
-
-- **t2.micro :**
-- **t2.large :**
-
-### Throughput
+We conclude that t2.large clusters are 14% more efficient than t2.micro clusters. 
+However we expected that cluster 1 lost some requests due to too much requests sended in opposite of cluster 2 who would easily respond to those requests. 
 
 
 ## Instructions to Run code
