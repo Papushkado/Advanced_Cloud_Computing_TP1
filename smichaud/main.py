@@ -116,7 +116,7 @@ def clean_up(ec2, instance_ids, key_name, group_id):
     
     
 instance_ids = [private_instance_cluster0[0][0], private_instance_cluster1[0][0], lb_instance_id]
-for p in len(private_instance_cluster0):
+for p in range(len(private_instance_cluster0)):
     instance_ids.append(private_instance_cluster0[p][0])
     instance_ids.append(private_instance_cluster1[p][0])
 clean_up(ec2, instance_ids, key_pair_name, group_id)
