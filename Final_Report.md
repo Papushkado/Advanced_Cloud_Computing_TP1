@@ -1,7 +1,9 @@
 # FastAPI Benchmark and Deployment Report
 
+Authors : Stéphane Michaud 1904016 - Stephen Cohen 2412336 - Zabiullah Shair Zaie 2087651 - Asma Boukhdhir 2412257
 ---
 - [FastAPI Benchmark and Deployment Report](#fastapi-benchmark-and-deployment-report)
+  - [Authors : Stéphane Michaud 1904016 - Stephen Cohen 2412336 - Zabiullah Shair Zaie 2087651 - Asma Boukhdhir 2412257](#authors--stéphane-michaud-1904016---stephen-cohen-2412336---zabiullah-shair-zaie-2087651---asma-boukhdhir-2412257)
   - [FastAPI Deployment Procedure](#fastapi-deployment-procedure)
     - [Key Pair and Security Group](#key-pair-and-security-group)
     - [Worker Instances Setup](#worker-instances-setup)
