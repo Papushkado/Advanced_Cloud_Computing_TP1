@@ -1,4 +1,4 @@
-This code can be ran using docker
+This code can be run using docker
 
 First, make sure you have docker installed on your machine.
 
